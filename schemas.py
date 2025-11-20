@@ -12,7 +12,7 @@ Model name is converted to lowercase for the collection name:
 """
 
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import Optional, List
 
 # Example schemas (replace with your own):
 
@@ -38,11 +38,32 @@ class Product(BaseModel):
     category: str = Field(..., description="Product category")
     in_stock: bool = Field(True, description="Whether product is in stock")
 
-# Add your own schemas here:
-# --------------------------------------------------
+# Apex Performance Nexus schemas
 
-# Note: The Flames database viewer will automatically:
-# 1. Read these schemas from GET /schema endpoint
-# 2. Use them for document validation when creating/editing
-# 3. Handle all database operations (CRUD) directly
-# 4. You don't need to create any database endpoints!
+class Vector3D(BaseModel):
+    x: float
+    y: float
+    z: float
+
+class EEGFrequency(BaseModel):
+    alpha: float = Field(ge=0)
+    beta: float = Field(ge=0)
+    gamma: float = Field(ge=0)
+    delta: float = Field(ge=0)
+    theta: float = Field(ge=0)
+
+class EMGData(BaseModel):
+    channels: List[float] = Field(default_factory=list, description="EMG channel amplitudes")
+
+class BioMetrics(BaseModel):
+    """Biometric snapshot for an athlete session.
+    Collection name: "biometrics"
+    """
+    heartRate: List[float] = Field(default_factory=list, description="Recent HR samples")
+    emgSignals: EMGData
+    motionCapture: Vector3D
+    oxygenSaturation: float
+    lactateThreshold: float
+    neuralActivity: EEGFrequency
+    athleteId: Optional[str] = None
+    sessionId: Optional[str] = None
